@@ -65,10 +65,7 @@ function getZipArchives() {
 function validateZipArchives(zipArchives: string[]) {
   zipArchives.forEach(zipArchive => {
     if (!fs.lstatSync(path(zipArchive)).isFile()) {
-      throw new Error(`Invalid zip archive: ${zipArchive}`);
-    }
-  });
-}
+  
 
 function restoreAssets() {
   const masterKey = Buffer.from(vaultData.masterKey, 'base64');
