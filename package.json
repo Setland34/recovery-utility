@@ -35,7 +35,7 @@
     "typescript": "4.2.2"
   },
   "dependencies": {
-    "adm-zip": "0.5.2",
+    "adm-zip": "0.5.16",
     "chalk": "4.1.0",
     "md5": "2.3.0",
     "shamir": "0.7.1",
