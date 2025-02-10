@@ -38,10 +38,16 @@ $ vault12-recovery ~/vault12-files
 ```
 5. You should find all recovered assets from the Vault in the directory `~/vault12-files/output`.
 
-## License
+## Validation
 
-Vault12 Recovery Utility is released under the [MIT License](http://opensource.org/licenses/MIT).
+The utility includes several validation functions to ensure the integrity of the data:
 
-## Legal Reminder
+1. `validateVaultData`: Validates the structure of the `vault12.json` file.
+2. `validateZipArchives`: Validates the structure of the zip archives.
+3. `validateAssetShards`: Validates the structure of the asset shards.
 
-Exporting/importing and/or use of strong cryptography software, providing cryptography hooks, or even just communicating technical details about cryptography software is illegal in some parts of the world. If you import this software to your country, re-distribute it from there or even just email technical suggestions or provide source patches to the authors or other people you are strongly advised to pay close attention to any laws or regulations which apply to you. The authors of this software are not liable for any violations you make - it is your responsibility to be aware of and comply with any laws or regulations which apply to you.
+These validation steps are automatically performed during the recovery process to ensure the data is correctly structured and can be successfully decrypted.
+
+## Total Allowance
+
+The utility calculates the total allowance of assets during the recovery process. The total allowance is the sum of the sizes of all assets in the vault. This value is displayed at the end of the recovery process.

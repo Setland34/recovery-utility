@@ -40,7 +40,15 @@ function getVaultData(): ExportVaultMetadata {
   if (!fs.lstatSync(keyFilePath).isFile()) {
     throw new Error(`Expected ${dir} to contain ${keyFilePath}`);
   }
-  return JSON.parse(fs.readFileSync(keyFilePath, { encoding: 'utf-8' }));
+  const vaultData = JSON.parse(fs.readFileSync(keyFilePath, { encoding: 'utf-8' }));
+  validateVaultData(vaultData);
+  return vaultData;
+}
+
+function validateVaultData(vaultData: ExportVaultMetadata) {
+  if (!vaultData.masterKey || !vaultData.assetsMetaData || !vaultData.shardsRequiredToUnlock) {
+    throw new Error('Invalid vault data structure');
+  }
 }
 
 function getZipArchives() {
@@ -50,7 +58,16 @@ function getZipArchives() {
     throw new Error(`According to your security policy, you need to receive data from ${vaultData.shardsRequiredToUnlock} guardians, but you provided only ${zipArchives.length}`);
   }
 
+  validateZipArchives(zipArchives);
   return zipArchives;
+}
+
+function validateZipArchives(zipArchives: string[]) {
+  zipArchives.forEach(zipArchive => {
+    if (!fs.lstatSync(path(zipArchive)).isFile()) {
+      throw new Error(`Invalid zip archive: ${zipArchive}`);
+    }
+  });
 }
 
 function restoreAssets() {
@@ -77,6 +94,8 @@ function restoreAssets() {
     process.stdout.write(chalk.green('✓') + '\n');
   })
   console.log(chalk.green(`Assets successfully unlocked and stored in ${workingOutputDir}`));
+  const totalAllowance = calculateTotalAllowance(vaultData.assetsMetaData);
+  console.log(chalk.green(`Total Allowance: ${totalAllowance}`));
 }
 
 function createDir(workingOutputDir: string) {
@@ -111,6 +130,17 @@ function findAssetShardsInArchives() {
       }
     })
   })
+  validateAssetShards(vaultData.assetsMetaData);
+}
+
+function validateAssetShards(assetsMetaData: ExportAssetMetadata[]) {
+  assetsMetaData.forEach(asset => {
+    asset.shards.forEach(shard => {
+      if (!shard.id || !shard.md5) {
+        throw new Error(`Invalid asset shard structure for asset: ${asset.name}`);
+      }
+    });
+  });
 }
 
 function getArchiveIndex(archiveDirName: string) {
@@ -157,4 +187,8 @@ function decryptAsset(asset: ExportAssetMetadata, encryptedData: Buffer, masterK
     throw new Error(`Failed to decrypt ${asset.name}`);
   }
   return decrypted;
+}
+
+function calculateTotalAllowance(assetsMetaData: ExportAssetMetadata[]): number {
+  return assetsMetaData.reduce((total, asset) => total + asset.size, 0);
 }
