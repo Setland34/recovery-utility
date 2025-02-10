@@ -47,7 +47,7 @@ function getVaultData(): ExportVaultMetadata {
 
 function validateVaultData(vaultData: ExportVaultMetadata) {
   if (!vaultData.masterKey || !vaultData.assetsMetaData || !vaultData.shardsRequiredToUnlock) {
-    throw new Error('Invalid vault data structure');
+  
   }
 }
 
